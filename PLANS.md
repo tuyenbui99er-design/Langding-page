@@ -49,3 +49,8 @@ Acceptance: 1 item = 189,000 VND; 2 items = 318,000 VND; malformed/forged orders
 - Remaining P0 dependency: real media, approved material, measured size chart and inventory/policy evidence absent. UI states this honestly; no corresponding complete-media checkbox claimed.
 - Environment: install_script and start_skill saved in onboarding draft; added required api.github.com domain to draft for PR creation. Saving is not runtime application or publication; new-task snapshot restoration has not been verified.
 - PR API currently blocked by network policy (`https://api.github.com` Forbidden); Git HTTPS read verified. Complete/push review branch, then retry PR once supported API access is applied. No production changes.
+
+### Review handoff
+- Implementation commit `9b6aab7` pushed successfully to `origin/feat/p0-cod-storefront`.
+- `gh pr create --base main --head feat/p0-cod-storefront --body-file /tmp/minimal-p0-pr.md` attempted; blocked with `Post https://api.github.com/graphql: Forbidden`. No PR number was created or claimed.
+- API domain requirement is saved in environment draft. Apply/review/save the environment network setting and publish the development environment when appropriate, then retry PR creation; this is not a production deploy. Manual fallback is the GitHub new-PR page for the pushed branch.
