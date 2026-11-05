@@ -50,16 +50,21 @@ APP_ORIGIN=http://localhost:3000 npm run start -- --port 3000
 
 ## Tài nguyên và thông tin còn thiếu
 
-Không có ảnh/video thật trong repository. Thư viện hiển thị **khung chờ được ghi nhãn rõ**, không có ảnh stock, review hay số bán giả. Khi có tài nguyên được xác nhận, đặt vào:
+Người bán đã gửi ảnh sáu màu trong hội thoại; tệp gốc chưa có trong workspace nên chưa thể đưa chính các ảnh đó vào build. Thư viện tiếp tục hiển thị **khung chờ được ghi nhãn rõ**, không có ảnh stock, review hay số bán giả. Khi các tệp gốc có thể truy cập, đặt vào:
 
 ```text
-public/product/main.webp
-public/product/detail.webp
-public/product/video.mp4
-public/product/poster.webp
+public/product/den.jpg       # Đen
+public/product/ghi.jpg       # Ghi
+public/product/kem.jpg       # Kem
+public/product/khoi-la.jpg   # Khói lạ
+public/product/be-khoi.jpg   # Be khói
+public/product/nau.jpg       # Nâu
+public/product/detail.webp   # ảnh chi tiết, nếu có
+public/product/video.mp4     # video thật, nếu có
+public/product/poster.webp   # poster video, nếu có
 ```
 
-Build lại sau khi thêm tài nguyên. Ảnh dùng Next Image responsive; ảnh chi tiết tải lazy. Video chỉ hiển thị khi có cả video và poster, có controls, `preload=none`, không autoplay. Chưa kiểm chứng nội dung media thật vì chưa được cung cấp.
+Mỗi ảnh màu cũng có thể là `.webp`, `.jpeg` hoặc `.png` với cùng tên gốc. Trang sẽ hiện ảnh màu đang chọn; nếu màu đó thiếu tệp, hiện khung chờ, không lấy ảnh màu khác thay thế. Build lại sau khi thêm tài nguyên. Ảnh dùng Next Image responsive; ảnh chi tiết tải lazy. Video chỉ hiển thị khi có cả video và poster, có controls, `preload=none`, không autoplay. Chưa kiểm chứng nội dung media thật vì chưa được cung cấp.
 
 Chờ xác nhận chất liệu, số đo từng size, tồn kho, thời gian giao, điều kiện đổi trả/bảo hành. Không suy đoán bảng cân nặng từng size. Những phần chưa có chứng cứ được ghi rõ trên trang; không công bố “vintex xuất khẩu”, 68.000 lượt bán, 4,9 sao, đổi 3 ngày hoặc bảo hành 3 tháng.
 

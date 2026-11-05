@@ -64,24 +64,41 @@ function savePending(attempt: PendingAttempt | null) {
 }
 export default function Shop({ media }: { media: ProductMedia }) {
   const router = useRouter();
-  const [color, setColor] = useState("");
+  const [color, setColor] = useState<(typeof product.colors)[number] | "">("");
   const [size, setSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [gallery, setGallery] = useState(0);
-  const [failedMedia, setFailedMedia] = useState<number[]>([]);
+  const [failedMedia, setFailedMedia] = useState<string[]>([]);
   const [checkout, setCheckout] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const sending = useRef(false);
   const attempt = useRef<PendingAttempt | null>(null);
   const totals = pricing(quantity);
+  const previewColor =
+    color ||
+    (media.byColor["Nâu"]
+      ? "Nâu"
+      : product.colors.find((candidate) => media.byColor[candidate]) || "");
   const image =
-    gallery === 0 ? media.main : gallery === 1 ? media.detail : null;
-  const mediaFailed = failedMedia.includes(gallery);
-  const markMediaFailed = () =>
+    gallery === 0
+      ? previewColor
+        ? media.byColor[previewColor]
+        : media.main
+      : gallery === 1
+        ? media.detail
+        : null;
+  const currentMediaPath = gallery === 2 ? media.video : image;
+  const mediaFailed =
+    !!currentMediaPath && failedMedia.includes(currentMediaPath);
+  const markMediaFailed = () => {
+    if (!currentMediaPath) return;
     setFailedMedia((previous) =>
-      previous.includes(gallery) ? previous : [...previous, gallery],
+      previous.includes(currentMediaPath)
+        ? previous
+        : [...previous, currentMediaPath],
     );
+  };
   function buy() {
     if (!color || !size) {
       setError("Vui lòng chọn màu và kích cỡ trước khi đặt hàng.");
@@ -175,7 +192,7 @@ export default function Shop({ media }: { media: ProductMedia }) {
           <div className="image-wrap">
             <Image
               src={image}
-              alt={`${product.name} — ${gallery === 0 ? "toàn cảnh" : "chi tiết"}`}
+              alt={`${product.name} — ${gallery === 0 ? `màu ${previewColor || "sản phẩm"}` : "chi tiết"}`}
               fill
               sizes="(max-width: 520px) 100vw, 496px"
               loading={gallery === 0 ? "eager" : "lazy"}
@@ -229,7 +246,9 @@ export default function Shop({ media }: { media: ProductMedia }) {
             ? "Không tải được tệp sản phẩm. Vui lòng thử lại sau."
             : !image && !(gallery === 2 && media.video && media.poster)
               ? "Khung minh họa bố cục, không phải hình ảnh sản phẩm. Đang chờ tài nguyên được nhà bán hàng xác nhận."
-              : "Hình ảnh / video do nhà bán hàng cung cấp."}
+              : gallery === 0 && previewColor
+                ? `Ảnh sản phẩm màu ${previewColor}. Chọn màu để xem đúng biến thể.`
+                : "Hình ảnh / video do nhà bán hàng cung cấp."}
         </p>
       </section>
       <section className="product">
@@ -253,7 +272,10 @@ export default function Shop({ media }: { media: ProductMedia }) {
                   type="button"
                   key={c}
                   aria-pressed={c === color}
-                  onClick={() => setColor(c)}
+                  onClick={() => {
+                    setColor(c);
+                    setGallery(0);
+                  }}
                 >
                   <i style={{ background: swatches[i] }} />
                   {c}

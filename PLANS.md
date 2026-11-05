@@ -64,3 +64,9 @@ Acceptance: 1 item = 189,000 VND; 2 items = 318,000 VND; malformed/forged orders
 - Updated API and browser tests for TLS termination and reload-after-commit recovery. Verification and branch push results are recorded below after the checks complete.
 - P0 review fixes verified: `npm run lint` PASS; `npm run typecheck` PASS; `npm test` 5/5 PASS; `npm run build` PASS; `npm run test:e2e` 6/6 PASS. New assertions cover HTTPS APP_ORIGIN behind HTTP proxy and idempotent retry after full page reload with a lost response. No browser PII was stored in sessionStorage.
 - Next.js rewrites `next-env.d.ts` between dev and build. Removed it from tracking and ignored the generated file; `npm run typecheck` passed with that file absent, and Next recreates it on startup.
+
+## 2026-11-05 — Seller photo handoff
+
+- Seller sent seven image previews covering six color variants (Nâu, Khói lạ, Be khói, Kem, Ghi, Đen; Đen appears twice). They are visible in chat but have no accessible file path or upload ID in the cloud workspace. Do not recreate or alter them through image generation.
+- Added exact color-to-file mapping and variant-specific preview with a labeled fallback for missing assets. The original photos are not included in the branch yet. Supported filenames and formats are in README.md. Actual photo integration and validation wait for accessible original files; video and measured size chart remain outstanding.
+- Seller confirmed the inline photos have no workspace path or direct download link. The six original image files are still required to display them. `npm run lint`, `npm run typecheck`, `npm test` (6/6), `npm run build`, and `npm run test:e2e` (6/6) passed with the new color mapping and labeled missing-image fallback. Saved revised `start_skill` in the environment draft; no runtime/publish effect yet.
