@@ -20,3 +20,8 @@ coverage/
 Thumbs.db
 .vscode/
 .idea/
+
+# Private database and browser artifacts
+data/
+test-results/
+playwright-report/
