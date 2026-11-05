@@ -65,10 +65,24 @@ test("API validation, real storage, HttpOnly receipt, idempotency, abuse and una
     assert.match(cookie, /Secure/i);
     assert.match(cookie, /SameSite=strict/i);
     const { reference } = await response.json();
+    const proxied = await POST(
+      new NextRequest("http://internal:3000/api/orders", {
+        method: "POST",
+        headers: {
+          origin: "https://shop.example",
+          "content-type": "application/json",
+          "idempotency-key": key,
+          "x-receipt-token": token,
+        },
+        body: JSON.stringify(input),
+      }),
+    );
+    assert.equal(proxied.status, 201);
+    assert.match(proxied.headers.get("set-cookie") || "", /Secure/i);
     const store = new OrderStore();
     assert.equal(store.get(reference, token)?.total, 189000);
     store.close();
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 8; i++) {
       const duplicate = await POST(request());
       assert.equal(duplicate.status, 201);
       assert.equal((await duplicate.json()).reference, reference);

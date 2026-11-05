@@ -162,9 +162,27 @@ test("committed order survives a lost response without duplicate on retry", asyn
   );
   await page.getByRole("button", { name: /Đặt hàng COD/ }).click();
   await expect(page.locator(".error")).toBeVisible();
+  const pending = await page.evaluate(() =>
+    sessionStorage.getItem("minimal.pending-order.v1"),
+  );
+  expect(pending).toBeTruthy();
+  expect(pending).not.toContain("0900000002");
+  expect(pending).not.toContain(input.address);
+  await page.reload();
+  await page.getByRole("button", { name: "Đen", exact: true }).click();
+  await page.getByRole("button", { name: "M", exact: true }).click();
+  await page.getByRole("button", { name: "Mua ngay" }).click();
+  await page.getByLabel("Họ và tên").fill(input.name);
+  await page.getByLabel("Số điện thoại").fill("0900000002");
+  await page.getByLabel("Địa chỉ nhận hàng đầy đủ").fill(input.address);
   await page.getByRole("button", { name: /Đặt hàng COD/ }).click();
   await expect(page).toHaveURL(new RegExp(reference));
   await expect(
     page.getByRole("heading", { name: "Cảm ơn bạn." }),
   ).toBeVisible();
+  expect(
+    await page.evaluate(() =>
+      sessionStorage.getItem("minimal.pending-order.v1"),
+    ),
+  ).toBeNull();
 });

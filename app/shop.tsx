@@ -12,24 +12,76 @@ const swatches = [
   "#b4a18a",
   "#735648",
 ];
+const pendingKey = "minimal.pending-order.v1";
+type PendingAttempt = {
+  key: string;
+  token: string;
+  fingerprint: string;
+  createdAt: number;
+};
+async function fingerprint(payload: string) {
+  const bytes = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(payload),
+  );
+  return Array.from(new Uint8Array(bytes), (byte) =>
+    byte.toString(16).padStart(2, "0"),
+  ).join("");
+}
+function readPending(): PendingAttempt | null {
+  try {
+    const item = window.sessionStorage.getItem(pendingKey);
+    if (!item) return null;
+    const parsed: unknown = JSON.parse(item);
+    if (!parsed || typeof parsed !== "object") return null;
+    const candidate = parsed as Record<string, unknown>;
+    if (
+      typeof candidate.key === "string" &&
+      /^[a-f0-9-]{36}$/.test(candidate.key) &&
+      typeof candidate.token === "string" &&
+      /^[a-f0-9]{64}$/.test(candidate.token) &&
+      typeof candidate.fingerprint === "string" &&
+      /^[a-f0-9]{64}$/.test(candidate.fingerprint) &&
+      typeof candidate.createdAt === "number" &&
+      candidate.createdAt <= Date.now() &&
+      candidate.createdAt > Date.now() - 24 * 60 * 60 * 1000
+    ) {
+      return candidate as PendingAttempt;
+    }
+  } catch {
+    // Storage may be disabled. Same-page retries still use the React ref.
+  }
+  return null;
+}
+function savePending(attempt: PendingAttempt | null) {
+  try {
+    if (attempt)
+      window.sessionStorage.setItem(pendingKey, JSON.stringify(attempt));
+    else window.sessionStorage.removeItem(pendingKey);
+  } catch {
+    // Storage is optional; the API still enforces idempotency for a stable key.
+  }
+}
 export default function Shop({ media }: { media: ProductMedia }) {
   const router = useRouter();
   const [color, setColor] = useState("");
   const [size, setSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [gallery, setGallery] = useState(0);
+  const [failedMedia, setFailedMedia] = useState<number[]>([]);
   const [checkout, setCheckout] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const sending = useRef(false);
-  const attempt = useRef<{
-    key: string;
-    token: string;
-    payload: string;
-  } | null>(null);
+  const attempt = useRef<PendingAttempt | null>(null);
   const totals = pricing(quantity);
   const image =
     gallery === 0 ? media.main : gallery === 1 ? media.detail : null;
+  const mediaFailed = failedMedia.includes(gallery);
+  const markMediaFailed = () =>
+    setFailedMedia((previous) =>
+      previous.includes(gallery) ? previous : [...previous, gallery],
+    );
   function buy() {
     if (!color || !size) {
       setError("Vui lòng chọn màu và kích cỡ trước khi đặt hàng.");
@@ -59,15 +111,22 @@ export default function Shop({ media }: { media: ProductMedia }) {
       address: form.get("address"),
       notes: form.get("notes"),
     });
-    if (!attempt.current || attempt.current.payload !== payload)
-      attempt.current = {
-        key: crypto.randomUUID(),
-        token: Array.from(crypto.getRandomValues(new Uint8Array(32)), (v) =>
-          v.toString(16).padStart(2, "0"),
-        ).join(""),
-        payload,
-      };
     try {
+      const payloadFingerprint = await fingerprint(payload);
+      const previous = attempt.current || readPending();
+      if (previous?.fingerprint === payloadFingerprint) {
+        attempt.current = previous;
+      } else {
+        attempt.current = {
+          key: crypto.randomUUID(),
+          token: Array.from(crypto.getRandomValues(new Uint8Array(32)), (v) =>
+            v.toString(16).padStart(2, "0"),
+          ).join(""),
+          fingerprint: payloadFingerprint,
+          createdAt: Date.now(),
+        };
+        savePending(attempt.current);
+      }
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: {
@@ -80,6 +139,8 @@ export default function Shop({ media }: { media: ProductMedia }) {
       const result = await response.json();
       if (!response.ok)
         throw new Error(result.error || "Không thể lưu đơn hàng.");
+      savePending(null);
+      attempt.current = null;
       router.push(`/orders/${encodeURIComponent(result.reference)}`);
     } catch (err) {
       setError(
@@ -94,18 +155,23 @@ export default function Shop({ media }: { media: ProductMedia }) {
   return (
     <>
       <section className="media" aria-label="Thư viện sản phẩm">
-        {gallery === 2 && media.video && media.poster ? (
+        {gallery === 2 && media.video && media.poster && !mediaFailed ? (
           <video
             className="real-media"
             controls
             preload="none"
             poster={media.poster}
             aria-label="Video sản phẩm"
+            onError={markMediaFailed}
           >
-            <source src={media.video} type="video/mp4" />
+            <source
+              src={media.video}
+              type="video/mp4"
+              onError={markMediaFailed}
+            />
             Trình duyệt không hỗ trợ video. Vui lòng xem ảnh sản phẩm.
           </video>
-        ) : image ? (
+        ) : image && !mediaFailed ? (
           <div className="image-wrap">
             <Image
               src={image}
@@ -113,6 +179,7 @@ export default function Shop({ media }: { media: ProductMedia }) {
               fill
               sizes="(max-width: 520px) 100vw, 496px"
               loading={gallery === 0 ? "eager" : "lazy"}
+              onError={markMediaFailed}
             />
           </div>
         ) : (
@@ -134,9 +201,11 @@ export default function Shop({ media }: { media: ProductMedia }) {
                 }
               </p>
               <small>
-                {gallery === 2
-                  ? "VIDEO SẢN PHẨM ĐANG CHỜ CUNG CẤP"
-                  : "ẢNH SẢN PHẨM ĐANG CHỜ CUNG CẤP"}
+                {mediaFailed
+                  ? "KHÔNG TẢI ĐƯỢC TÀI NGUYÊN"
+                  : gallery === 2
+                    ? "VIDEO SẢN PHẨM ĐANG CHỜ CUNG CẤP"
+                    : "ẢNH SẢN PHẨM ĐANG CHỜ CUNG CẤP"}
               </small>
             </div>
             <span className="vertical">FORM / FUNCTION / EVERYDAY</span>
@@ -156,9 +225,11 @@ export default function Shop({ media }: { media: ProductMedia }) {
           ))}
         </div>
         <p className="media-note">
-          {!image && !(gallery === 2 && media.video && media.poster)
-            ? "Khung minh họa bố cục, không phải hình ảnh sản phẩm. Đang chờ tài nguyên được nhà bán hàng xác nhận."
-            : "Hình ảnh / video do nhà bán hàng cung cấp."}
+          {mediaFailed
+            ? "Không tải được tệp sản phẩm. Vui lòng thử lại sau."
+            : !image && !(gallery === 2 && media.video && media.poster)
+              ? "Khung minh họa bố cục, không phải hình ảnh sản phẩm. Đang chờ tài nguyên được nhà bán hàng xác nhận."
+              : "Hình ảnh / video do nhà bán hàng cung cấp."}
         </p>
       </section>
       <section className="product">

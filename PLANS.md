@@ -51,6 +51,15 @@ Acceptance: 1 item = 189,000 VND; 2 items = 318,000 VND; malformed/forged orders
 - PR API currently blocked by network policy (`https://api.github.com` Forbidden); Git HTTPS read verified. Complete/push review branch, then retry PR once supported API access is applied. No production changes.
 
 ### Review handoff
+
 - Implementation commit `9b6aab7` pushed successfully to `origin/feat/p0-cod-storefront`.
 - `gh pr create --base main --head feat/p0-cod-storefront --body-file /tmp/minimal-p0-pr.md` attempted; blocked with `Post https://api.github.com/graphql: Forbidden`. No PR number was created or claimed.
 - API domain requirement is saved in environment draft. Apply/review/save the environment network setting and publish the development environment when appropriate, then retry PR creation; this is not a production deploy. Manual fallback is the GitHub new-PR page for the pushed branch.
+
+### P0 review fixes (2026-11-05)
+
+- Fixed receipt cookie Secure flag to use the validated public HTTPS origin behind a TLS-terminating proxy.
+- Retained idempotency key/token plus a payload hash in tab sessionStorage for up to 24 hours, enabling exact retry after a reload and lost server response. Raw buyer details are not stored there. Receipt success clears this temporary state.
+- Added media load-error fallback for supplied files. Real assets and size evidence remain missing, so Phase 1 media stays open.
+- Updated API and browser tests for TLS termination and reload-after-commit recovery. Verification and branch push results are recorded below after the checks complete.
+- P0 review fixes verified: `npm run lint` PASS; `npm run typecheck` PASS; `npm test` 5/5 PASS; `npm run build` PASS; `npm run test:e2e` 6/6 PASS. New assertions cover HTTPS APP_ORIGIN behind HTTP proxy and idempotent retry after full page reload with a lost response. No browser PII was stored in sessionStorage.

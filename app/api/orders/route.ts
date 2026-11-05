@@ -71,7 +71,8 @@ export async function POST(request: NextRequest) {
     );
     response.cookies.set(receiptCookie(order.reference), token, {
       httpOnly: true,
-      secure: request.nextUrl.protocol === "https:",
+      // The public origin is authoritative when TLS terminates at a reverse proxy.
+      secure: expected.startsWith("https://"),
       sameSite: "strict",
       path: `/orders/${order.reference}`,
       maxAge: 60 * 60 * 24 * 30,
