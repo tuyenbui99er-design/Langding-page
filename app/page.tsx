@@ -1,4 +1,5 @@
 import Shop from "./shop";
+import SizeChart from "./size-chart";
 import { productMedia } from "@/lib/media";
 import { product } from "@/lib/product";
 export default function Page() {
@@ -23,17 +24,13 @@ export default function Page() {
         <details>
           <summary>Chất liệu & mô tả</summary>
           <p>
-            Chất liệu, số đo và hướng dẫn bảo quản đang chờ nhà bán hàng xác
-            nhận. Chưa có căn cứ để công bố “vintex xuất khẩu”.
+            Chất liệu và hướng dẫn bảo quản đang chờ nhà bán hàng xác nhận. Chưa
+            có căn cứ để công bố “vintex xuất khẩu”.
           </p>
         </details>
         <details>
           <summary>Bảng kích cỡ</summary>
-          <p>S · M · L · XL · 2XL · 3XL</p>
-          <p>
-            Chưa có bảng số đo từng size được xác nhận. Không suy đoán size theo
-            cân nặng; cần đối chiếu số đo trước khi mua.
-          </p>
+          <SizeChart />
         </details>
         <details>
           <summary>Giao hàng & đổi trả</summary>

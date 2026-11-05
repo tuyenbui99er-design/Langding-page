@@ -12,7 +12,7 @@ Acceptance: clean install and development server work; project builds; responsiv
 
 ## Phase 1 — Product and pricing [P0]
 
-- [ ] Product video with poster, image gallery, description and size chart. **Partial:** media rendering/policy/size sections implemented; six color photos were sent in chat but original files are not accessible in the workspace; video, approved material and per-size measurements have not been supplied. Placeholders are explicitly labeled; no invented claims.
+- [ ] Product video with poster, image gallery, description and size chart. **Partial:** media rendering/policy/size sections implemented; seller size chart is implemented from supplied data; six color photos are visible in chat but original files are not accessible, and supplied MOV exceeds the 32 MiB transfer limit. Approved material/policy evidence is still missing. Placeholders are explicitly labeled; no invented claims.
 - [x] Select color, size and quantity; show validation and inventory-status behavior where known.
 - [x] Live sale price, compare-at price, item subtotal, shipping and total.
 - [x] Automated price tests for 1, 2, 3 units and input edge cases.

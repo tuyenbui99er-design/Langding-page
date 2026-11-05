@@ -28,6 +28,30 @@ for (const width of [320, 360, 390, 430]) {
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
+    await page.getByText("Bảng kích cỡ", { exact: true }).click();
+    const sizeTable = page.getByRole("table", {
+      name: "Bảng size tham khảo của nhà bán hàng",
+    });
+    await expect(sizeTable).toBeVisible();
+    const sizeRows = sizeTable.locator("tbody tr");
+    await expect(sizeRows).toHaveCount(6);
+    await expect(sizeRows.nth(0).locator("th, td")).toHaveText([
+      "S",
+      "66–68",
+      "78",
+      "38–42",
+    ]);
+    await expect(sizeRows.nth(5).locator("th, td")).toHaveText([
+      "3XL",
+      "86–88",
+      "83",
+      "71–76",
+    ]);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
     await page.getByRole("button", { name: "Mua ngay" }).click();
     await expect(page.locator(".error[role=alert]")).toContainText("chọn màu");
     await page.getByRole("button", { name: "Đen", exact: true }).click();

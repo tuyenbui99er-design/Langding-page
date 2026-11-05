@@ -64,9 +64,9 @@ public/product/video.mp4     # video thật, nếu có
 public/product/poster.webp   # poster video, nếu có
 ```
 
-Mỗi ảnh màu cũng có thể là `.webp`, `.jpeg` hoặc `.png` với cùng tên gốc. Trang sẽ hiện ảnh màu đang chọn; nếu màu đó thiếu tệp, hiện khung chờ, không lấy ảnh màu khác thay thế. Build lại sau khi thêm tài nguyên. Ảnh dùng Next Image responsive; ảnh chi tiết tải lazy. Video chỉ hiển thị khi có cả video và poster, có controls, `preload=none`, không autoplay. Chưa kiểm chứng nội dung media thật vì chưa được cung cấp.
+Mỗi ảnh màu cũng có thể là `.webp`, `.jpeg` hoặc `.png` với cùng tên gốc. Trang sẽ hiện ảnh màu đang chọn; nếu màu đó thiếu tệp, hiện khung chờ, không lấy ảnh màu khác thay thế. Build lại sau khi thêm tài nguyên. Ảnh dùng Next Image responsive; ảnh chi tiết tải lazy. Video chỉ hiển thị khi có cả video và poster, có controls, `preload=none`, không autoplay. Video MOV đã được gửi nhưng vượt giới hạn chuyển tệp 32 MiB của công cụ nên chưa tải được vào workspace; cần bản nhỏ hơn hoặc link tải trực tiếp trước khi chuyển sang MP4 và kiểm chứng phát video.
 
-Chờ xác nhận chất liệu, số đo từng size, tồn kho, thời gian giao, điều kiện đổi trả/bảo hành. Không suy đoán bảng cân nặng từng size. Những phần chưa có chứng cứ được ghi rõ trên trang; không công bố “vintex xuất khẩu”, 68.000 lượt bán, 4,9 sao, đổi 3 ngày hoặc bảo hành 3 tháng.
+Bảng size đã được nhập từ ảnh do nhà bán hàng gửi: S 66–68/78/38–42; M 70–72/79/43–49; L 74–76/80/50–56; XL 78–80/81/57–63; 2XL 82–84/82/64–70; 3XL 86–88/83/71–76 (vòng eo cm / chiều dài cm / cân nặng kg). Cân nặng chỉ để tham khảo, không bảo đảm độ vừa vặn. Chờ xác nhận chất liệu, tồn kho, thời gian giao và điều kiện đổi trả/bảo hành. Những phần chưa có chứng cứ được ghi rõ trên trang; không công bố “vintex xuất khẩu”, 68.000 lượt bán, 4,9 sao, đổi 3 ngày hoặc bảo hành 3 tháng.
 
 Trang sản phẩm có nội dung HTML SSR và metadata cơ bản. `noindex` chủ động trong bản phát triển. Canonical, sitemap, structured data, tracking và audit hiệu năng thuộc P1, cần domain/dữ liệu thật trước khi bật.
 

@@ -517,3 +517,28 @@ footer {
 body:has(.checkout input:focus, .checkout textarea:focus) .purchase-bar {
   display: none;
 }
+.size-chart {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.size-chart caption {
+  padding: 0 0 12px;
+  text-align: left;
+  color: var(--muted);
+}
+.size-chart th,
+.size-chart td {
+  border: 1px solid var(--line);
+  padding: 9px 4px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.size-chart thead {
+  background: #eeeee7;
+}
+.size-chart th:first-child {
+  width: 17%;
+}
