@@ -63,3 +63,4 @@ Acceptance: 1 item = 189,000 VND; 2 items = 318,000 VND; malformed/forged orders
 - Added media load-error fallback for supplied files. Real assets and size evidence remain missing, so Phase 1 media stays open.
 - Updated API and browser tests for TLS termination and reload-after-commit recovery. Verification and branch push results are recorded below after the checks complete.
 - P0 review fixes verified: `npm run lint` PASS; `npm run typecheck` PASS; `npm test` 5/5 PASS; `npm run build` PASS; `npm run test:e2e` 6/6 PASS. New assertions cover HTTPS APP_ORIGIN behind HTTP proxy and idempotent retry after full page reload with a lost response. No browser PII was stored in sessionStorage.
+- Next.js rewrites `next-env.d.ts` between dev and build. Removed it from tracking and ignored the generated file; `npm run typecheck` passed with that file absent, and Next recreates it on startup.
